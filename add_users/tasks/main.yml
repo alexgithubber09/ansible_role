@@ -1,0 +1,41 @@
+---
+# tasks file for add_users
+- name: Ensure group "somegroup" exists
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ group_name }}"
+
+- name: Add some users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: present
+    groups: "{{ item.groups }}"
+  loop:
+    - { name: "{{ user_name[0] }}", groups: "{{ group_name[0] }}" }
+    - { name: "{{ user_name[1] }}", groups: "{{ group_name[0] }}" }
+    - { name: "{{ user_name[2] }}", groups: "{{ group_name[1] }}" }
+
+- name: Create SSH keys for users
+  ansible.builtin.user:
+    name: "{{ item }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+  loop: "{{ user_name }}"
+
+- name: Change ownership of a directory /opt
+  ansible.builtin.file:
+    path: /opt
+    state: directory
+    owner: "{{ user_name[0] }}"
+    group: "{{ group_name[0] }}"
+    mode: '0755'
+
+- name: Change ownership of a file
+  ansible.builtin.file:
+    path: /home/test/file.txt
+    owner: "{{ user_name[2] }}"
+    group: "{{ group_name[1] }}"
+    mode: '0644'
+

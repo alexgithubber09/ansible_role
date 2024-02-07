@@ -1,0 +1,11 @@
+---
+# vars file for add_users
+user_name:
+  - Mike
+  - John
+  - Bob
+
+group_name:
+  - group1
+  - group2
+
